@@ -86,4 +86,37 @@ note `[TableArn]`
 --policy-name dynamodb-item-crud-role \
 --policy-document file://privilege-policy.json`
 
+14. set up a way to access the lamdba function over HTTPS using the AWS API Gateway service:
+`aws apigateway create-rest-api --name bookstore`
 
+note down [id] - rest-api-id
+
+15. get the id of the root API resource ("/"):
+
+`aws apigateway get-resources --rest-api-id [id]`
+
+note down [id] - root-path-id
+
+16. create a new resource under the root path:
+
+`aws apigateway create-resource --rest-api-id [rest-api-id] \
+--parent-id [root-path-id] --path-part books`
+
+note down [id] - id
+
+17. register the HTTP method of ANY:
+
+`aws apigateway put-method --rest-api-id [rest-api-id] \
+--resource-id [id] --http-method ANY \
+--authorization-type NONE`
+
+18. integrate the resource with our lambda function:
+
+`aws apigateway put-integration --rest-api-id [rest-api-id] \
+--resource-id [resource-id] --http-method ANY --type AWS_PROXY \
+--integration-http-method POST \
+--uri arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:[account-id]:function:books/invocations`
+
+19. send a test request to the resource:
+
+`aws apigateway test-invoke-method --rest-api-id [rest-api-id] --resource-id [resource-id] --http-method "GET"`
