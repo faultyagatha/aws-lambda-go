@@ -120,3 +120,17 @@ note down [id] - id
 19. send a test request to the resource:
 
 `aws apigateway test-invoke-method --rest-api-id [rest-api-id] --resource-id [resource-id] --http-method "GET"`
+
+20. add aws-lambda-go/events package:
+
+`go get github.com/aws/aws-lambda-go/events`
+
+we can query Cloudwatch for errors:
+
+`aws logs filter-log-events --log-group-name /aws/lambda/books \
+--filter-pattern "ERROR"`
+
+21. deploy:
+
+`aws apigateway create-deployment --rest-api-id [rest-api-id] \
+--stage-name staging`
